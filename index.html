@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmaceutical Case Studies</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 30px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+            color: #000000;
+            text-transform: uppercase;
+        }
+
+
+        .subtitle {
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            color: #666666;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+            letter-spacing: 0.5px;
+        }
+
+        /* Floating Card Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+            padding: 10px;
+        }
+
+        /* Individual Floating Cards */
+        .case-card {
+            background: #f8f8f8;
+            border-radius: 20px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: visible;
+            border: 1px solid #e0e0e0;
+            transform-style: preserve-3d;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a:has(.case-card) {
+            display: block;
+            height: 100%;
+        }
+
+
+        .case-card::before,
+        .case-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 20px;
+            z-index: -1;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #e0e0e0;
+        }
+
+        .case-card::before {
+            transform: translate(-6px, -6px);
+            opacity: 0.8;
+        }
+
+        .case-card::after {
+            transform: translate(-12px, -12px);
+            opacity: 0.5;
+        }
+
+        .case-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .case-card:hover::before {
+            transform: translate(-8px, -8px);
+            opacity: 0.9;
+        }
+
+        .case-card:hover::after {
+            transform: translate(-14px, -14px);
+            opacity: 0.6;
+        }
+
+
+        .card-header {
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+            font-weight: 900;
+            color: #000000;
+            margin-bottom: 10px;
+            line-height: 1.2;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: #333333;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .card-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #000000;
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-subtitle {
+            color: #666666;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .card-preview {
+            color: #555555;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            font-weight: 400;
+            flex-grow: 1;
+        }
+
+        .expand-indicator {
+            display: none;
+        }
+
+        /* Expanded Content */
+        .card-expanded-content {
+            display: none;
+        }
+
+        /* Back Button */
+        .back-button {
+            display: none;
+        }
+
+        /* Modal/Expanded View */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border-radius: 20px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 50px;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f5f5f5;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .close-button:hover {
+            background: #e63946;
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .modal-content h2 {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .modal-content h3 {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .modal-content p {
+            color: #333333;
+            margin-bottom: 15px;
+            font-size: clamp(0.95rem, 2vw, 1rem);
+            line-height: 1.7;
+            font-weight: 500;
+        }
+
+        .modal-content ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content li {
+            margin-bottom: 10px;
+            color: #333333;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .modal-content h3 {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            color: #000000;
+        }
+
+        .highlight {
+            background: #f0f0f0;
+            border-left: 6px solid #000000;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .highlight strong {
+            color: #000000;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #000000;
+            color: #ffffff;
+            padding: 14px 28px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 900;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-button:hover {
+            background: #333333;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            color: #999999;
+            font-size: 0.85rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 1024px) {
+            .cards-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .container {
+                padding: 30px 20px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .container {
+                padding: 30px 15px;
+            }
+
+            header {
+                margin-bottom: 30px;
+            }
+
+            .case-card {
+                padding: 20px;
+            }
+
+            .card-meta {
+                flex-direction: column;
+                gap: 6px;
+            }
+        }
+
+        /* Ethical Compass */
+        .ethical-compass {
+            background: #f5f5f5;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+            border: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .ethical-compass h3 {
+            color: #000000;
+            margin-bottom: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .compass-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .compass-quadrant {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .compass-quadrant:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .compass-quadrant.selected {
+            background: #000000;
+            color: #ffffff;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .compass-quadrant h4 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: inherit;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .compass-quadrant p {
+            font-size: 0.85rem;
+            color: inherit;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .compass-label {
+            display: inline-block;
+            background: #000000;
+            color: #ffffff;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+        }
+
+        .compass-quadrant.selected .compass-label {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .compass-analysis {
+            background: white;
+            border-left: 6px solid #000000;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .compass-analysis.visible {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .compass-analysis h4 {
+            color: #000000;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .compass-analysis p {
+            color: #333333;
+            line-height: 1.7;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar for modal */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #e63946;
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #d62839;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Pharmaceutical Case Studies</h1>
+            <p class="subtitle">Critical Analysis of Industry Practices and Regulatory Oversight</p>
+        </header>
+
+        <!-- Floating Cards Grid -->
+        <div class="cards-grid">
+            <!-- Theranos Card -->
+            <a href="theranos-case-study.html" style="text-decoration: none; color: inherit;">
+            <div class="case-card" data-case="theranos">
+                <button class="back-button">Back to Overview</button>
+                
+                <div class="card-header">
+                    <h3 class="card-title">Theranos: Architecture of a $9B Mirage</h3>
+                    <p class="card-subtitle">Blood-testing fraud that deceived investors and endangered patients</p>
+                    
+                    <div class="card-meta">
+                        <span>📅 2003-2023</span>
+                        <span>💰 $9 Billion</span>
+                        <span>⚖️ Convicted</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">Wire Fraud</span>
+                        <span class="tag">Investor Deception</span>
+                        <span class="tag">Whistleblower Suppression</span>
+                    </div>
+                </div>
+                
+                <p class="card-preview">Elizabeth Holmes's blood-testing company promised to revolutionize diagnostics with a single finger prick. The Edison device was "nothing more than a mirage" — secretly using third-party equipment while misleading investors and patients.</p>
+                <div class="expand-indicator">Read Full Investigation</div>
+                
+                <div class="card-expanded-content">
+                    <p>This report examines the rapid ascent and catastrophic failure of Theranos, Inc., focusing on the systemic fraud executed by founder Elizabeth Holmes and co-executive Ramesh "Sunny" Balwani.</p>
+                    
+                    <div class="highlight">
+                        <strong>The Switch:</strong> October 2015 — Wall Street Journal reporter John Carreyrou published an exposé revealing the Edison device's limitations and secret use of third-party machines. The $9 billion valuation collapsed.
+                    </div>
+
+                    <h3>Timeline of Events</h3>
+                    <ul>
+                        <li><strong>2003:</strong> Holmes, age 19, dropped out of Stanford to found Theranos</li>
+                        <li><strong>2013:</strong> Rise to prominence; Holmes became media star</li>
+                        <li><strong>2015:</strong> $9 billion valuation; Walgreens partnership</li>
+                        <li><strong>Oct 2015:</strong> WSJ exposé revealed technology limitations</li>
+                        <li><strong>Jan 2016:</strong> CMS warned tests endangered patient health</li>
+                        <li><strong>2018:</strong> SEC charged Holmes and Balwani; company dissolved</li>
+                        <li><strong>Jan 2022:</strong> Holmes convicted on 4 counts of fraud</li>
+                        <li><strong>Nov 2022:</strong> Holmes sentenced to 11+ years</li>
+                        <li><strong>May 2023:</strong> Holmes began serving sentence</li>
+                        <li><strong>Feb 2025:</strong> Appeal denied; $452M restitution ordered</li>
+                    </ul>
+
+                    <h3>Key Impact</h3>
+                    <p><strong>Patients:</strong> Received inaccurate test results affecting medical decisions</p>
+                    <p><strong>Investors:</strong> Lost hundreds of millions of dollars</p>
+                    <p><strong>Industry:</strong> "Crucial moment in Silicon Valley" against "fake it till you make it" culture</p>
+
+                    <div class="ethical-compass">
+                        <h3>Interactive Ethical Compass</h3>
+                        <p style="margin-bottom: 20px; color: #666;">Select a framework to analyze this case:</p>
+                        
+                        <div class="compass-grid">
+                            <div class="compass-quadrant" data-framework="utilitarian">
+                                <span class="compass-label">Utilitarian</span>
+                                <h4>Greatest Good</h4>
+                                <p>Focus on outcomes and consequences for the majority</p>
+                            </div>
+                            
+                            <div class="compass-quadrant" data-framework="deontological">
+                                <span class="compass-label">Deontological</span>
+                                <h4>Duty & Rules</h4>
+                                <p>Emphasis on moral obligations and universal principles</p>
+                            </div>
+                            
+                            <div class="compass-quadrant" data-framework="virtue">
+                                <span class="compass-label">Virtue Ethics</span>
+                                <h4>Character & Integrity</h4>
+                                <p>Evaluation based on moral character and virtues</p>
+                            </div>
+                            
+                            <div class="compass-quadrant" data-framework="care">
+                                <span class="compass-label">Care Ethics</span>
+                                <h4>Relationships & Harm</h4>
+                                <p>Focus on care, empathy, and preventing harm</p>
+                            </div>
+                        </div>
+                        
+                        <div class="compass-analysis" data-analysis="utilitarian">
+                            <h4>Utilitarian Analysis</h4>
+                            <p><strong>Harm:</strong> Patients received false results, investors lost billions, public trust in healthcare innovation damaged.</p>
+                            <p><strong>Benefit:</strong> None realized; promised benefits were fraudulent.</p>
+                            <p><strong>Verdict:</strong> Massive net negative utility. The deception caused widespread harm with zero actual benefit to society.</p>
+                        </div>
+                        
+                        <div class="compass-analysis" data-analysis="deontological">
+                            <h4>Deontological Analysis</h4>
+                            <p><strong>Duties Violated:</strong> Duty to tell truth, duty not to deceive, duty to protect patients, fiduciary duty to investors.</p>
+                            <p><strong>Universal Principles:</strong> Actions violated categorical imperative—lying and fraud cannot be universalized.</p>
+                            <p><strong>Verdict:</strong> Clear moral failure. Holmes treated people as means to her ends, violating fundamental duties.</p>
+                        </div>
+                        
+                        <div class="compass-analysis" data-analysis="virtue">
+                            <h4>Virtue Ethics Analysis</h4>
+                            <p><strong>Virtues Lacking:</strong> Honesty, integrity, humility, courage to admit failure.</p>
+                            <p><strong>Vices Displayed:</strong> Deception, arrogance, greed, cowardice (suppressing whistleblowers).</p>
+                            <p><strong>Verdict:</strong> Holmes exhibited vicious character—prioritizing image and wealth over truth and human welfare.</p>
+                        </div>
+                        
+                        <div class="compass-analysis" data-analysis="care">
+                            <h4>Care Ethics Analysis</h4>
+                            <p><strong>Relationships Betrayed:</strong> Patients, investors, employees, board members, business partners.</p>
+                            <p><strong>Harm Caused:</strong> Medical harm to patients, financial ruin for investors, career damage to whistleblowers.</p>
+                            <p><strong>Verdict:</strong> Complete failure of care. Holmes prioritized self-interest over responsibility to vulnerable stakeholders.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </a>
+
+            <!-- Shkreli Card -->
+            <a href="shkreli-case-study.html" style="text-decoration: none; color: inherit;">
+            <div class="case-card" data-case="shkreli">
+                <button class="back-button">Back to Overview</button>
+                
+                <div class="card-header">
+                    <h3 class="card-title">Shkreli Network: Financial Fraud & Pharma Speculation</h3>
+                    <p class="card-subtitle">Ponzi scheme architect who became symbol of pharmaceutical greed</p>
+                    
+                    <div class="card-meta">
+                        <span>📅 2011-2017</span>
+                        <span>💰 $11M+ Fraud</span>
+                        <span>⚖️ 7 Years Prison</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">Ponzi Scheme</span>
+                        <span class="tag">Price Gouging</span>
+                        <span class="tag">Asset Seizure</span>
+                    </div>
+                </div>
+                
+                <p class="card-preview">Known as "Pharma Bro" for raising Daraprim price by 5,500%, Martin Shkreli was actually convicted for operating a Ponzi scheme — using his biotech company Retrophin as a "piggy bank" to cover hedge fund losses.</p>
+                <div class="expand-indicator">View Complete Timeline</div>
+                
+                <div class="card-expanded-content">
+                    <p>This investigation documents the multi-layered scandal surrounding Martin Shkreli, analyzing the architecture of his financial deceptions and pharmaceutical speculation.</p>
+                    
+                    <div class="highlight">
+                        <strong>The Switch:</strong> December 2015 — Martin Shkreli, age 32, arrested by FBI in New York. Known globally as "Pharma Bro" for raising Daraprim price by 5,500%, he was actually charged with defrauding investors through a Ponzi scheme.
+                    </div>
+
+                    <h3>Timeline of Events</h3>
+                    <ul>
+                        <li><strong>2011:</strong> Founded Retrophin biotechnology company</li>
+                        <li><strong>2011-2014:</strong> Operated MSMB hedge funds fraudulently</li>
+                        <li><strong>Sept 2014:</strong> Ejected from Retrophin</li>
+                        <li><strong>2015:</strong> Raised Daraprim price from $13.50 to $750 (5,500%)</li>
+                        <li><strong>Nov 2015:</strong> Won Wu-Tang Clan album for $2M using stolen funds</li>
+                        <li><strong>Dec 2015:</strong> FBI arrest on fraud charges</li>
+                        <li><strong>2017:</strong> Convicted on 2 counts of fraud</li>
+                        <li><strong>March 2018:</strong> Sentenced to 7 years + $7.36M restitution</li>
+                    </ul>
+
+                    <h3>Key Impact</h3>
+                    <p><strong>Patients:</strong> Daraprim price remains over $800/pill; many cannot afford treatment</p>
+                    <p><strong>Investors:</strong> Some profited despite fraud, complicating legal case</p>
+                    <p><strong>Public:</strong> Became symbol of pharmaceutical industry greed</p>
+
+                    <div class="ethical-compass">
+                        <h3>Interactive Ethical Compass</h3>
+                        <p style="margin-bottom: 20px; color: #666;">Select a framework to analyze this case:</p>
+                        
+                        <div class="compass-grid">
+                            <div class="compass-quadrant" data-framework="utilitarian">
+                                <span class="compass-label">Utilitarian</span>
+                                <h4>Greatest Good</h4>
+                                <p>Focus on outcomes and consequences for the majority</p>
+                            </div>
+                            
+                            <div class="compass-quadrant" data-framework="deontological">
+                                <span class="compass-label">Deontological</span>
+                                <h4>Duty & Rules</h4>
+                                <p>Emphasis on moral obligations and universal principles</p>
+                            </div>
+                            
+                            <div class="compass-quadrant" data-framework="virtue">
+                                <span class="compass-label">Virtue Ethics</span>
+                                <h4>Character & Integrity</h4>
+                                <p>Evaluation based on moral character and virtues</p>
+                            </div>
+                            
+                            <div class="compass-quadrant" data-framework="care">
+                                <span class="compass-label">Care Ethics</span>
+                                <h4>Relationships & Harm</h4>
+                                <p>Focus on care, empathy, and preventing harm</p>
+                            </div>
+                        </div>
+                        
+                        <div class="compass-analysis" data-analysis="utilitarian">
+                            <h4>Utilitarian Analysis</h4>
+                            <p><strong>Harm:</strong> AIDS/cancer patients denied affordable life-saving medication; public trust in pharma damaged.</p>
+                            <p><strong>Benefit:</strong> Shkreli's personal wealth; some investors profited from Ponzi scheme.</p>
+                            <p><strong>Verdict:</strong> Net negative. Harm to vulnerable patients far outweighs financial gains to few individuals.</p>
+                        </div>
+                        
+                        <div class="compass-analysis" data-analysis="deontological">
+                            <h4>Deontological Analysis</h4>
+                            <p><strong>Duties Violated:</strong> Fiduciary duty to investors, duty not to defraud, duty to provide accessible healthcare.</p>
+                            <p><strong>Legal vs Moral:</strong> Price gouging was legal but morally indefensible; fraud was both illegal and immoral.</p>
+                            <p><strong>Verdict:</strong> Dual moral failure—fraudulent means AND exploitative ends.</p>
+                        </div>
+                        
+                        <div class="compass-analysis" data-analysis="virtue">
+                            <h4>Virtue Ethics Analysis</h4>
+                            <p><strong>Virtues Lacking:</strong> Compassion, fairness, honesty, humility.</p>
+                            <p><strong>Vices Displayed:</strong> Greed, arrogance, callousness toward suffering, dishonesty.</p>
+                            <p><strong>Verdict:</strong> Shkreli's character exemplifies vice—using power to exploit the vulnerable for personal gain.</p>
+                        </div>
+                        
+                        <div class="compass-analysis" data-analysis="care">
+                            <h4>Care Ethics Analysis</h4>
+                            <p><strong>Vulnerable Populations:</strong> AIDS patients, cancer patients, uninsured individuals.</p>
+                            <p><strong>Harm Caused:</strong> Life-threatening medication made unaffordable; patients forced to skip doses or abandon treatment.</p>
+                            <p><strong>Verdict:</strong> Complete disregard for care. Shkreli exploited those most in need of protection.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </a>
+
+            <!-- Pfizer Card -->
+            <a href="pfizer-case-study.html" style="text-decoration: none; color: inherit;">
+            <div class="case-card" data-case="pfizer">
+                <button class="back-button">Back to Overview</button>
+                
+                <div class="card-header">
+                    <h3 class="card-title">Pfizer Trovan Trial: Unauthorized Testing in Nigeria</h3>
+                    <p class="card-subtitle">Experimental drug testing on children during epidemic without consent</p>
+                    
+                    <div class="card-meta">
+                        <span>📅 1996-2011</span>
+                        <span>💀 11 Deaths</span>
+                        <span>⚖️ $35M Settlement</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">Unauthorized Testing</span>
+                        <span class="tag">Ethical Violations</span>
+                        <span class="tag">Falsified Documents</span>
+                    </div>
+                </div>
+                
+                <p class="card-preview">During a 1996 meningitis epidemic, Pfizer tested an experimental antibiotic on 200 Nigerian children without consent. Ethics approval was "concocted and backdated." The suppressed government report remained hidden for five years.</p>
+                <div class="expand-indicator">Access Full Report</div>
+                
+                <div class="card-expanded-content">
+                    <p>This investigation examines the unauthorized clinical trial conducted by Pfizer in Kano, Nigeria during a 1996 meningitis epidemic, revealing systematic exploitation of vulnerable populations.</p>
+                    
+                    <div class="highlight">
+                        <strong>The Switch:</strong> May 7, 2006 — A confidential Nigerian government report leaked to The Washington Post, revealing Pfizer conducted an "illegal trial of an unregistered drug" on 200 children. The report had been suppressed for five years.
+                    </div>
+
+                    <h3>Timeline of Events</h3>
+                    <ul>
+                        <li><strong>1996:</strong> Trial conducted during meningitis epidemic; 11 children died</li>
+                        <li><strong>Dec 2000:</strong> Public exposure following Washington Post investigation</li>
+                        <li><strong>2001:</strong> Families sued Pfizer in New York federal court</li>
+                        <li><strong>2001 (Summer):</strong> US judge dismissed lawsuit citing lack of jurisdiction</li>
+                        <li><strong>May 2006:</strong> Confidential Nigerian report leaked to press</li>
+                        <li><strong>2009:</strong> Pfizer settled: $35M compensation fund + health projects</li>
+                        <li><strong>Aug 2011:</strong> First payments: $175,000 to each of four families</li>
+                        <li><strong>2009-2011:</strong> Two years required for DNA tests to verify eligibility</li>
+                    </ul>
+
+                    <h3>Key Impact</h3>
+                    <p><strong>Children:</strong> 11 died, dozens left with permanent disabilities</p>
+                    <p><strong>Families:</strong> Years of legal battles; compensation delayed by verification process</p>
+                    <p><strong>Global:</strong> Exposed exploitation of vulnerable populations in drug trials</p>
+
+                    <div class="ethical-compass">
+                        <h3>Interactive Ethical Compass</h3>
+                        <p style="margin-bottom: 20px; color: #666;">Select a framework to analyze this case:</p>
+                        
+                        <div class="compass-grid">
+                            <div class="compass-quadrant" data-framework="utilitarian">
+                                <span class="compass-label">Utilitarian</span>
+                                <h4>Greatest Good</h4>
+                                <p>Focus on outcomes and consequences for the majority</p>
+                            </div>
+                            
+                            <div class="compass-quadrant" data-framework="deontological">
+                                <span class="compass-label">Deontological</span>
+                                <h4>Duty & Rules</h4>
+                                <p>Emphasis on moral obligations and universal principles</p>
+                            </div>
+                            
+                            <div class="compass-quadrant" data-framework="virtue">
+                                <span class="compass-label">Virtue Ethics</span>
+                                <h4>Character & Integrity</h4>
+                                <p>Evaluation based on moral character and virtues</p>
+                            </div>
+                            
+                            <div class="compass-quadrant" data-framework="care">
+                                <span class="compass-label">Care Ethics</span>
+                                <h4>Relationships & Harm</h4>
+                                <p>Focus on care, empathy, and preventing harm</p>
+                            </div>
+                        </div>
+                        
+                        <div class="compass-analysis" data-analysis="utilitarian">
+                            <h4>Utilitarian Analysis</h4>
+                            <p><strong>Harm:</strong> 11 children died, dozens disabled; families traumatized; trust in Western medicine damaged in Nigeria.</p>
+                            <p><strong>Benefit:</strong> Pfizer gained drug trial data (though FDA later restricted Trovan due to liver damage).</p>
+                            <p><strong>Verdict:</strong> Catastrophic net negative. Children's lives sacrificed for drug that was ultimately deemed too dangerous.</p>
+                        </div>
+                        
+                        <div class="compass-analysis" data-analysis="deontological">
+                            <h4>Deontological Analysis</h4>
+                            <p><strong>Laws Violated:</strong> Nigerian law, Declaration of Helsinki, UN Convention on Rights of the Child.</p>
+                            <p><strong>Consent Violation:</strong> No informed consent from children or parents; falsified ethics approval.</p>
+                            <p><strong>Verdict:</strong> Egregious violation of fundamental human rights and medical ethics. Children treated as mere means to corporate ends.</p>
+                        </div>
+                        
+                        <div class="compass-analysis" data-analysis="virtue">
+                            <h4>Virtue Ethics Analysis</h4>
+                            <p><strong>Virtues Lacking:</strong> Respect for persons, honesty, courage to conduct ethical research.</p>
+                            <p><strong>Vices Displayed:</strong> Exploitation, deception (backdated documents), cowardice (suppressing report).</p>
+                            <p><strong>Verdict:</strong> Colonial-era exploitation in modern form. Pfizer treated vulnerable African children as expendable test subjects.</p>
+                        </div>
+                        
+                        <div class="compass-analysis" data-analysis="care">
+                            <h4>Care Ethics Analysis</h4>
+                            <p><strong>Vulnerable Populations:</strong> Sick children, families in crisis during epidemic, poor communities.</p>
+                            <p><strong>Power Imbalance:</strong> Wealthy US corporation vs. impoverished Nigerian families; information asymmetry.</p>
+                            <p><strong>Verdict:</strong> Complete betrayal of care. Pfizer exploited desperation of families seeking help for dying children.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </a>
+        </div>
+
+        <footer>
+            <p>This resource is for educational and research purposes.</p>
+            <p style="margin-top: 10px; color: #666666;">Last updated: November 2024</p>
+        </footer>
+    </div>
+
+    <script>
+        // Subtle mouse tracking parallax effect
+        let mouseX = 0;
+        let mouseY = 0;
+        let currentX = 0;
+        let currentY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 10;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 10;
+        });
+
+        function animateCards() {
+            currentX += (mouseX - currentX) * 0.05;
+            currentY += (mouseY - currentY) * 0.05;
+
+            document.querySelectorAll('.case-card').forEach((card, index) => {
+                const depth = (index + 1) * 0.3;
+                const baseTransform = card.style.transform || '';
+                card.style.transform = `translate(${currentX * depth}px, ${currentY * depth}px)`;
+            });
+
+            requestAnimationFrame(animateCards);
+        }
+
+        animateCards();
+    </script>
+</body>
+</html>

@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shkreli Network Case Study - Forensic Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+            overflow-x: hidden;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Back Navigation */
+        .back-nav {
+            margin-bottom: 40px;
+            animation: slideRight 0.6s ease;
+        }
+
+        @keyframes slideRight {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #000000;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .back-button:hover {
+            background: #333333;
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .back-button::before {
+            content: '←';
+            font-size: 1.2rem;
+        }
+
+        /* Header */
+        .case-header {
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 2px solid #000000;
+            animation: slideUp 0.8s ease 0.2s both;
+        }
+
+        .case-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+        }
+
+        .case-subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: #666666;
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .case-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 1rem;
+            color: #333333;
+            font-weight: 600;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .tag {
+            background: #000000;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Content Sections */
+        .content-section {
+            margin-bottom: 60px;
+            animation: slideUp 0.8s ease both;
+        }
+
+        .content-section:nth-child(3) { animation-delay: 0.3s; }
+        .content-section:nth-child(4) { animation-delay: 0.4s; }
+        .content-section:nth-child(5) { animation-delay: 0.5s; }
+        .content-section:nth-child(6) { animation-delay: 0.6s; }
+
+        .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 900;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: #000000;
+            border-radius: 3px;
+        }
+
+        .section-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333333;
+        }
+
+        .section-content p {
+            margin-bottom: 20px;
+        }
+
+        .section-content strong {
+            color: #000000;
+            font-weight: 700;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: #f5f5f5;
+            border-left: 6px solid #000000;
+            padding: 30px;
+            margin: 40px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            animation: scaleIn 0.6s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .highlight-box .highlight-title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #000000;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .highlight-box p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #333333;
+            margin-bottom: 10px;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, #000000, #666666);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 30px;
+            animation: slideRight 0.6s ease both;
+        }
+
+        .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+        .timeline-item:nth-child(6) { animation-delay: 0.6s; }
+        .timeline-item:nth-child(7) { animation-delay: 0.7s; }
+        .timeline-item:nth-child(8) { animation-delay: 0.8s; }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -46px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            background: #000000;
+            border-radius: 50%;
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 0 3px #000000;
+        }
+
+        .timeline-year {
+            font-weight: 900;
+            font-size: 1.2rem;
+            color: #000000;
+            margin-bottom: 5px;
+        }
+
+        .timeline-description {
+            font-size: 1rem;
+            color: #555555;
+            line-height: 1.6;
+        }
+
+        /* Impact Grid */
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .impact-card {
+            background: #f8f8f8;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            animation: scaleIn 0.6s ease both;
+        }
+
+        .impact-card:nth-child(1) { animation-delay: 0.2s; }
+        .impact-card:nth-child(2) { animation-delay: 0.3s; }
+        .impact-card:nth-child(3) { animation-delay: 0.4s; }
+
+        .impact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .impact-card h3 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .impact-card p {
+            font-size: 1rem;
+            color: #555555;
+            line-height: 1.6;
+        }
+
+        /* Ethical Compass */
+        .ethical-compass {
+            background: #f5f5f5;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 50px 0;
+            border: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            animation: scaleIn 0.8s ease;
+        }
+
+        .compass-title {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            text-align: center;
+        }
+
+        .compass-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .compass-quadrant {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            animation: scaleIn 0.6s ease both;
+        }
+
+        .compass-quadrant:nth-child(1) { animation-delay: 0.2s; }
+        .compass-quadrant:nth-child(2) { animation-delay: 0.3s; }
+        .compass-quadrant:nth-child(3) { animation-delay: 0.4s; }
+        .compass-quadrant:nth-child(4) { animation-delay: 0.5s; }
+
+        .compass-quadrant:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .compass-quadrant.selected {
+            background: #000000;
+            color: #ffffff;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .compass-label {
+            display: inline-block;
+            background: #000000;
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .compass-quadrant.selected .compass-label {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .compass-quadrant h4 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .compass-quadrant p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .compass-analysis {
+            background: white;
+            border-left: 6px solid #000000;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            animation: slideUp 0.4s ease;
+        }
+
+        .compass-analysis.visible {
+            display: block;
+        }
+
+        .compass-analysis h4 {
+            font-size: 1.5rem;
+            color: #000000;
+            margin-bottom: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .compass-analysis p {
+            font-size: 1.05rem;
+            color: #333333;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        /* Assessment Button */
+        .assessment-button:hover {
+            background: #333333 !important;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            .case-title {
+                font-size: 2rem;
+            }
+
+            .case-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .timeline {
+                padding-left: 30px;
+            }
+
+            .impact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .compass-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Back Navigation -->
+        <div class="back-nav">
+            <a href="index.html" class="back-button">Back to Overview</a>
+        </div>
+
+        <!-- Header -->
+        <div class="case-header">
+            <h1 class="case-title">Forensic Analysis of the Shkreli Network</h1>
+            <p class="case-subtitle">Financial Fraud and Pharmaceutical Speculation</p>
+            
+            <div class="case-meta">
+                <div class="meta-item">📅 2011-2017</div>
+                <div class="meta-item">💰 Fraud: $11M+ Ponzi Scheme</div>
+                <div class="meta-item">⚖️ Status: Convicted - 7 Years Prison</div>
+            </div>
+
+            <div class="tags">
+                <span class="tag">Financial Fraud</span>
+                <span class="tag">Price Gouging</span>
+                <span class="tag">Ponzi Scheme</span>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="content-section">
+            <h2 class="section-title">Executive Summary</h2>
+            <div class="section-content">
+                <p>This investigation documents the multi-layered scandal surrounding Martin Shkreli, analyzing the architecture of his financial deceptions and pharmaceutical speculation. The case reveals a critical divergence: public notoriety from ethical transgression versus legal conviction for sophisticated financial fraud.</p>
+                
+                <div class="highlight-box">
+                    <div class="highlight-title">The Switch</div>
+                    <p><strong>December 2015</strong> — Martin Shkreli, age 32, arrested by FBI in New York. Known globally as "Pharma Bro" for raising Daraprim price by 5,500%, he was actually charged with defrauding investors through a Ponzi scheme.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Daraprim Vector -->
+        <div class="content-section">
+            <h2 class="section-title">I. The Daraprim Vector: Pharmaceutical Speculation</h2>
+            <div class="section-content">
+                <p>In 2015, Shkreli's company Turing Pharmaceuticals acquired rights to Daraprim, a critical drug for treating toxoplasmosis in AIDS patients and cancer patients.</p>
+                
+                <div class="highlight-box">
+                    <div class="highlight-title">Price Inflation</div>
+                    <p><strong>Overnight increase:</strong> From $13.50 to $750 per pill (5,500% increase)</p>
+                    <p><strong>Public Response:</strong> Hillary Clinton called it "shameful"; became symbol of pharmaceutical greed</p>
+                    <p><strong>Legal Status:</strong> No criminal charges filed for price gouging — remains legal</p>
+                    <p><strong>Current Status:</strong> Price remains over $800/pill; company cut R&D, facing losses</p>
+                </div>
+
+                <p><strong>Corporate Rebranding:</strong> Turing renamed to Vyera, then planned Phoenixus rebrand in attempt to escape negative publicity.</p>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="content-section">
+            <h2 class="section-title">II. Timeline of Events</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-year">2011</div>
+                    <div class="timeline-description">Founded Retrophin biotechnology company</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2011-2014</div>
+                    <div class="timeline-description">Operated MSMB hedge funds fraudulently, using Retrophin funds to cover losses</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">Sept 2014</div>
+                    <div class="timeline-description">Ejected from Retrophin for "immaturity and irrelevant gossip"</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2015</div>
+                    <div class="timeline-description">Raised Daraprim price from $13.50 to $750 (5,500%)</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">Nov 2015</div>
+                    <div class="timeline-description">Won Wu-Tang Clan album auction for $2M using misappropriated Retrophin funds</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">Dec 2015</div>
+                    <div class="timeline-description">FBI arrest on fraud charges</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2017</div>
+                    <div class="timeline-description">Convicted on 2 counts of fraud (acquitted on 5 others)</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">March 2018</div>
+                    <div class="timeline-description">Sentenced to 7 years prison + $75,000 fine + $7.36M restitution</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Architecture -->
+        <div class="content-section">
+            <h2 class="section-title">III. Financial Architecture: The MSMB/Retrophin Conduit</h2>
+            <div class="section-content">
+                <p>The conviction centered on Shkreli's conduct between 2011 and September 2014, operating a Ponzi scheme through interconnected financial entities.</p>
+                
+                <div class="highlight-box">
+                    <div class="highlight-title">The Mechanism</div>
+                    <p>Shkreli used biotechnology company Retrophin (publicly traded on Nasdaq) as a "piggy bank" to cover losses from his hedge funds MSMB Capital and MSMB Healthcare. When speculative funds operated at a loss, he diverted Retrophin cash to pay MSMB investors.</p>
+                </div>
+
+                <p><strong>Legal Paradox:</strong> Despite defrauding investors, some testified they profited significantly (up to 200% returns), complicating the case. However, the judge noted Shkreli's "enormous number of lies" and refusal to accept responsibility.</p>
+            </div>
+        </div>
+
+        <!-- Legal Remediation -->
+        <div class="content-section">
+            <h2 class="section-title">IV. Legal Remediation</h2>
+            <div class="section-content">
+                <div class="highlight-box">
+                    <div class="highlight-title">Sentencing</div>
+                    <p><strong>Prison:</strong> 7 years</p>
+                    <p><strong>Fine:</strong> $75,000</p>
+                    <p><strong>Restitution:</strong> $7.36 million</p>
+                    <p>Judge noted Shkreli's "enormous number of lies" and refusal to accept responsibility. Despite weeping in court, he continues to appeal.</p>
+                </div>
+
+                <p><strong>Asset Seizures:</strong></p>
+                <ul style="margin-left: 20px; margin-bottom: 20px;">
+                    <li style="margin-bottom: 10px;">Picasso artwork</li>
+                    <li style="margin-bottom: 10px;">Lil Wayne unreleased album</li>
+                    <li style="margin-bottom: 10px;">Isaac Newton manuscript</li>
+                    <li style="margin-bottom: 10px;">Charles Darwin letter</li>
+                </ul>
+
+                <p><strong>Co-Conspirator:</strong> Lawyer Evan Greebel sentenced to 18 months + $10.5M restitution to Retrophin</p>
+            </div>
+        </div>
+
+        <!-- Key Impact -->
+        <div class="content-section">
+            <h2 class="section-title">V. Key Impact</h2>
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <h3>Patients</h3>
+                    <p>Daraprim price remains over $800/pill; many AIDS and cancer patients cannot afford treatment. Patients forced to skip doses or abandon treatment entirely.</p>
+                </div>
+                <div class="impact-card">
+                    <h3>Investors</h3>
+                    <p>Some profited despite fraud, complicating legal case. However, the fraudulent scheme violated fiduciary duties and market integrity.</p>
+                </div>
+                <div class="impact-card">
+                    <h3>Public</h3>
+                    <p>Became symbol of pharmaceutical industry greed. Highlighted the legal gap allowing extreme price gouging on life-saving medications.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ethical Compass -->
+        <div class="ethical-compass">
+            <h2 class="compass-title">Interactive Ethical Compass</h2>
+            <p style="text-align: center; margin-bottom: 30px; color: #666; font-size: 1.1rem;">Select a framework to analyze this case:</p>
+            
+            <div class="compass-grid">
+                <div class="compass-quadrant" data-framework="utilitarian">
+                    <span class="compass-label">Utilitarian</span>
+                    <h4>Greatest Good</h4>
+                    <p>Focus on outcomes and consequences for the majority</p>
+                </div>
+                
+                <div class="compass-quadrant" data-framework="deontological">
+                    <span class="compass-label">Deontological</span>
+                    <h4>Duty & Rules</h4>
+                    <p>Emphasis on moral obligations and universal principles</p>
+                </div>
+                
+                <div class="compass-quadrant" data-framework="virtue">
+                    <span class="compass-label">Virtue Ethics</span>
+                    <h4>Character & Integrity</h4>
+                    <p>Evaluation based on moral character and virtues</p>
+                </div>
+                
+                <div class="compass-quadrant" data-framework="care">
+                    <span class="compass-label">Care Ethics</span>
+                    <h4>Relationships & Harm</h4>
+                    <p>Focus on care, empathy, and preventing harm</p>
+                </div>
+            </div>
+            
+            <div class="compass-analysis" data-analysis="utilitarian">
+                <h4>Utilitarian Analysis</h4>
+                <p><strong>Harm:</strong> AIDS/cancer patients denied affordable life-saving medication; public trust in pharma damaged.</p>
+                <p><strong>Benefit:</strong> Shkreli's personal wealth; some investors profited from Ponzi scheme.</p>
+                <p><strong>Verdict:</strong> Net negative. Harm to vulnerable patients far outweighs financial gains to few individuals.</p>
+            </div>
+            
+            <div class="compass-analysis" data-analysis="deontological">
+                <h4>Deontological Analysis</h4>
+                <p><strong>Duties Violated:</strong> Fiduciary duty to investors, duty not to defraud, duty to provide accessible healthcare.</p>
+                <p><strong>Legal vs Moral:</strong> Price gouging was legal but morally indefensible; fraud was both illegal and immoral.</p>
+                <p><strong>Verdict:</strong> Dual moral failure—fraudulent means AND exploitative ends.</p>
+            </div>
+            
+            <div class="compass-analysis" data-analysis="virtue">
+                <h4>Virtue Ethics Analysis</h4>
+                <p><strong>Virtues Lacking:</strong> Compassion, fairness, honesty, humility.</p>
+                <p><strong>Vices Displayed:</strong> Greed, arrogance, callousness toward suffering, dishonesty.</p>
+                <p><strong>Verdict:</strong> Shkreli's character exemplifies vice—using power to exploit the vulnerable for personal gain.</p>
+            </div>
+            
+            <div class="compass-analysis" data-analysis="care">
+                <h4>Care Ethics Analysis</h4>
+                <p><strong>Vulnerable Populations:</strong> AIDS patients, cancer patients, uninsured individuals.</p>
+                <p><strong>Harm Caused:</strong> Life-threatening medication made unaffordable; patients forced to skip doses or abandon treatment.</p>
+                <p><strong>Verdict:</strong> Complete disregard for care. Shkreli exploited those most in need of protection.</p>
+            </div>
+        </div>
+        <!-- Take the Assessment -->
+        <div class="content-section" style="margin-top: 80px; padding-top: 60px; border-top: 2px solid #000000;">
+            <h2 class="section-title">Take the Ethical Assessment</h2>
+            <div class="section-content">
+                <p style="margin-bottom: 30px;">After reading this case study, test your own ethical framework with our interactive assessment. Answer 24 questions to discover your position on the Ethics Matrix.</p>
+                
+                <a href="Ethical Compass.html" class="assessment-button" style="display: inline-block; background: #000000; color: #ffffff; padding: 18px 36px; border-radius: 25px; text-decoration: none; font-weight: 700; font-size: 1.1rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); text-transform: uppercase; letter-spacing: 1px;">
+                    Start Assessment →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ethical compass interactivity
+        document.querySelectorAll('.compass-quadrant').forEach(quadrant => {
+            quadrant.addEventListener('click', () => {
+                const framework = quadrant.getAttribute('data-framework');
+                const compass = quadrant.closest('.ethical-compass');
+                
+                // Remove selected class from all quadrants
+                compass.querySelectorAll('.compass-quadrant').forEach(q => q.classList.remove('selected'));
+                
+                // Add selected class to clicked quadrant
+                quadrant.classList.add('selected');
+                
+                // Hide all analyses
+                compass.querySelectorAll('.compass-analysis').forEach(a => a.classList.remove('visible'));
+                
+                // Show corresponding analysis
+                const analysis = compass.querySelector(`[data-analysis="${framework}"]`);
+                if (analysis) {
+                    analysis.classList.add('visible');
+                }
+            });
+        });
+
+        // Smooth scroll for back button
+        document.querySelector('.back-button').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.body.style.animation = 'fadeOut 0.4s ease';
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 400);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pfizer Trovan Trial Case Study - Forensic Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+            overflow-x: hidden;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Back Navigation */
+        .back-nav {
+            margin-bottom: 40px;
+            animation: slideRight 0.6s ease;
+        }
+
+        @keyframes slideRight {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #000000;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .back-button:hover {
+            background: #333333;
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .back-button::before {
+            content: '←';
+            font-size: 1.2rem;
+        }
+
+        /* Header */
+        .case-header {
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 2px solid #000000;
+            animation: slideUp 0.8s ease 0.2s both;
+        }
+
+        .case-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+        }
+
+        .case-subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: #666666;
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .case-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 1rem;
+            color: #333333;
+            font-weight: 600;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .tag {
+            background: #000000;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Content Sections */
+        .content-section {
+            margin-bottom: 60px;
+            animation: slideUp 0.8s ease both;
+        }
+
+        .content-section:nth-child(3) { animation-delay: 0.3s; }
+        .content-section:nth-child(4) { animation-delay: 0.4s; }
+        .content-section:nth-child(5) { animation-delay: 0.5s; }
+        .content-section:nth-child(6) { animation-delay: 0.6s; }
+
+        .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 900;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: #000000;
+            border-radius: 3px;
+        }
+
+        .section-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333333;
+        }
+
+        .section-content p {
+            margin-bottom: 20px;
+        }
+
+        .section-content strong {
+            color: #000000;
+            font-weight: 700;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: #f5f5f5;
+            border-left: 6px solid #000000;
+            padding: 30px;
+            margin: 40px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            animation: scaleIn 0.6s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .highlight-box .highlight-title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #000000;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .highlight-box p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #333333;
+            margin-bottom: 10px;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, #000000, #666666);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 30px;
+            animation: slideRight 0.6s ease both;
+        }
+
+        .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+        .timeline-item:nth-child(6) { animation-delay: 0.6s; }
+        .timeline-item:nth-child(7) { animation-delay: 0.7s; }
+        .timeline-item:nth-child(8) { animation-delay: 0.8s; }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -46px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            background: #000000;
+            border-radius: 50%;
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 0 3px #000000;
+        }
+
+        .timeline-year {
+            font-weight: 900;
+            font-size: 1.2rem;
+            color: #000000;
+            margin-bottom: 5px;
+        }
+
+        .timeline-description {
+            font-size: 1rem;
+            color: #555555;
+            line-height: 1.6;
+        }
+
+        /* Impact Grid */
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .impact-card {
+            background: #f8f8f8;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            animation: scaleIn 0.6s ease both;
+        }
+
+        .impact-card:nth-child(1) { animation-delay: 0.2s; }
+        .impact-card:nth-child(2) { animation-delay: 0.3s; }
+        .impact-card:nth-child(3) { animation-delay: 0.4s; }
+
+        .impact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .impact-card h3 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .impact-card p {
+            font-size: 1rem;
+            color: #555555;
+            line-height: 1.6;
+        }
+
+        /* Ethical Compass */
+        .ethical-compass {
+            background: #f5f5f5;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 50px 0;
+            border: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            animation: scaleIn 0.8s ease;
+        }
+
+        .compass-title {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            text-align: center;
+        }
+
+        .compass-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .compass-quadrant {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            animation: scaleIn 0.6s ease both;
+        }
+
+        .compass-quadrant:nth-child(1) { animation-delay: 0.2s; }
+        .compass-quadrant:nth-child(2) { animation-delay: 0.3s; }
+        .compass-quadrant:nth-child(3) { animation-delay: 0.4s; }
+        .compass-quadrant:nth-child(4) { animation-delay: 0.5s; }
+
+        .compass-quadrant:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .compass-quadrant.selected {
+            background: #000000;
+            color: #ffffff;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .compass-label {
+            display: inline-block;
+            background: #000000;
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .compass-quadrant.selected .compass-label {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .compass-quadrant h4 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .compass-quadrant p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .compass-analysis {
+            background: white;
+            border-left: 6px solid #000000;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            animation: slideUp 0.4s ease;
+        }
+
+        .compass-analysis.visible {
+            display: block;
+        }
+
+        .compass-analysis h4 {
+            font-size: 1.5rem;
+            color: #000000;
+            margin-bottom: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .compass-analysis p {
+            font-size: 1.05rem;
+            color: #333333;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        /* Assessment Button */
+        .assessment-button:hover {
+            background: #333333 !important;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            .case-title {
+                font-size: 2rem;
+            }
+
+            .case-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .timeline {
+                padding-left: 30px;
+            }
+
+            .impact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .compass-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Back Navigation -->
+        <div class="back-nav">
+            <a href="index.html" class="back-button">Back to Overview</a>
+        </div>
+
+        <!-- Header -->
+        <div class="case-header">
+            <h1 class="case-title">Forensic Analysis of the Pfizer Trovan Trial</h1>
+            <p class="case-subtitle">Unauthorized Clinical Testing in Kano, Nigeria</p>
+            
+            <div class="case-meta">
+                <div class="meta-item">📅 1996-2011</div>
+                <div class="meta-item">💀 Casualties: 11 Children Died, Dozens Disabled</div>
+                <div class="meta-item">⚖️ Status: Settled $35M</div>
+            </div>
+
+            <div class="tags">
+                <span class="tag">Unauthorized Testing</span>
+                <span class="tag">Ethical Violations</span>
+                <span class="tag">Falsified Documents</span>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="content-section">
+            <h2 class="section-title">Executive Summary</h2>
+            <div class="section-content">
+                <p>This investigation examines the unauthorized clinical trial conducted by Pfizer in Kano, Nigeria during a 1996 meningitis epidemic. The case reveals systematic exploitation of vulnerable populations and falsification of ethical approval documents.</p>
+                
+                <div class="highlight-box">
+                    <div class="highlight-title">The Switch</div>
+                    <p><strong>May 7, 2006</strong> — A confidential Nigerian government report leaked to The Washington Post, revealing Pfizer conducted an "illegal trial of an unregistered drug" on 200 children. The report had been suppressed for five years.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Operational Context -->
+        <div class="content-section">
+            <h2 class="section-title">I. Operational Context: The 1996 Kano Intervention</h2>
+            <div class="section-content">
+                <p>During a meningitis epidemic that killed over 15,000 Africans, Pfizer deployed an experimental antibiotic at a field hospital in Kano, northern Nigeria, where Doctors Without Borders was already dispensing approved treatments.</p>
+                
+                <div class="highlight-box">
+                    <div class="highlight-title">Trial Parameters</div>
+                    <p><strong>Subject Pool:</strong> 200 children with brain infections from meningitis</p>
+                    <p><strong>Experimental Drug:</strong> Trovan (oral form never before given to children with meningitis)</p>
+                    <p><strong>Deaths:</strong> 5 children on Trovan, 6 on comparison drug (11 total)</p>
+                    <p><strong>Disabilities:</strong> Dozens of children left with permanent disabilities</p>
+                    <p><strong>Context:</strong> Doctors Without Borders was providing approved antibiotics at the same location</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="content-section">
+            <h2 class="section-title">II. Timeline of Events</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-year">1996</div>
+                    <div class="timeline-description">Trial conducted during meningitis epidemic; 11 children died</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">Dec 2000</div>
+                    <div class="timeline-description">Public exposure following Washington Post investigation</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2001</div>
+                    <div class="timeline-description">Families sued Pfizer in New York federal court for "cruel, inhuman and degrading treatment"</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2001 (Summer)</div>
+                    <div class="timeline-description">US judge dismissed lawsuit citing lack of jurisdiction (under appeal)</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">May 2006</div>
+                    <div class="timeline-description">Confidential Nigerian report leaked to press</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2009</div>
+                    <div class="timeline-description">Pfizer settled with Kano government: $35M compensation fund + health projects</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">Aug 2011</div>
+                    <div class="timeline-description">First payments: $175,000 to each of four families whose children died</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2009-2011</div>
+                    <div class="timeline-description">Two years required for DNA tests to verify compensation eligibility</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Trovan Vector -->
+        <div class="content-section">
+            <h2 class="section-title">III. The Trovan Vector: Architecture of Illegal Testing</h2>
+            <div class="section-content">
+                <div class="highlight-box">
+                    <div class="highlight-title">Critical Finding</div>
+                    <p>Pfizer tested an unapproved drug never registered in Nigeria. The FDA never approved Trovan for American children. After reports of liver damage and deaths, the FDA severely restricted adult use in 1999; European regulators banned it entirely.</p>
+                </div>
+
+                <p><strong>Violations Documented:</strong></p>
+                <ul style="margin-left: 20px; margin-bottom: 20px;">
+                    <li style="margin-bottom: 10px;">Nigerian law</li>
+                    <li style="margin-bottom: 10px;">International Declaration of Helsinki (ethical medical research)</li>
+                    <li style="margin-bottom: 10px;">UN Convention on the Rights of the Child</li>
+                    <li style="margin-bottom: 10px;">No informed consent obtained from children or parents</li>
+                    <li style="margin-bottom: 10px;">No authorization from Nigerian government</li>
+                </ul>
+
+                <p><strong>Protocol Deviations:</strong> Patient No. 0069, a 10-year-old girl, received Trovan for three days as her condition worsened, then died without receiving any alternative antibiotic — a "serious deviation" from trial protocol.</p>
+            </div>
+        </div>
+
+        <!-- Archival Deception -->
+        <div class="content-section">
+            <h2 class="section-title">IV. Archival Deception and Institutional Control</h2>
+            <div class="section-content">
+                <div class="highlight-box">
+                    <div class="highlight-title">Falsified Ethics Approval</div>
+                    <p>The approval letter from a Nigerian ethics committee was "concocted and backdated" by Pfizer's lead researcher. The hospital had no ethics committee in March 1996, and the letterhead was created months after the trial ended.</p>
+                </div>
+
+                <p><strong>Document Fabrication:</strong></p>
+                <ul style="margin-left: 20px; margin-bottom: 20px;">
+                    <li style="margin-bottom: 10px;"><strong>Backdated Letter:</strong> Created after trial, dated March 28, 1996 (one week before trial began)</li>
+                    <li style="margin-bottom: 10px;"><strong>Submitted to FDA:</strong> Pfizer used falsified letter as justification despite knowing it was fabricated</li>
+                    <li style="margin-bottom: 10px;"><strong>Local Doctor Exploited:</strong> Dr. Abdulhamid Isa Dutse listed as "principal investigator" but kept in dark about results; was "naive and exploited"</li>
+                    <li style="margin-bottom: 10px;"><strong>US Control:</strong> Researchers from Pfizer's US office actually controlled the trial</li>
+                </ul>
+
+                <p><strong>Report Suppression:</strong> Nigerian government report remained unreleased for 5 years; one copy stolen from government safe. Panel head Abdulsalami Nasidi received unspecified death threats.</p>
+            </div>
+        </div>
+
+        <!-- Congressional Response -->
+        <div class="content-section">
+            <h2 class="section-title">V. Congressional Response</h2>
+            <div class="section-content">
+                <div class="highlight-box">
+                    <div class="highlight-title">Rep. Tom Lantos Statement</div>
+                    <p>Called findings "absolutely appalling," stating pharmaceutical companies used "poor, illiterate and uninformed people as guinea pigs." He described conduct as "bordering on the criminal."</p>
+                </div>
+
+                <p><strong>Panel Recommendations:</strong></p>
+                <ul style="margin-left: 20px; margin-bottom: 20px;">
+                    <li style="margin-bottom: 10px;">Pfizer should be "sanctioned appropriately"</li>
+                    <li style="margin-bottom: 10px;">Pay restitution to victims</li>
+                    <li style="margin-bottom: 10px;">Issue "unreserved apology" to Nigeria</li>
+                    <li style="margin-bottom: 10px;">Nigeria should enact reforms to prevent recurrence</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Key Impact -->
+        <div class="content-section">
+            <h2 class="section-title">VI. Key Impact</h2>
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <h3>Children</h3>
+                    <p>11 children died during the trial, dozens left with permanent disabilities including brain damage, paralysis, and organ failure. Lives destroyed for corporate profit.</p>
+                </div>
+                <div class="impact-card">
+                    <h3>Families</h3>
+                    <p>Years of legal battles for justice. Compensation delayed by verification process requiring DNA tests. Many families never received closure.</p>
+                </div>
+                <div class="impact-card">
+                    <h3>Global</h3>
+                    <p>Exposed exploitation of vulnerable populations in drug trials. Damaged trust in Western medicine in Nigeria and across Africa. Highlighted need for stronger international oversight.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ethical Compass -->
+        <div class="ethical-compass">
+            <h2 class="compass-title">Interactive Ethical Compass</h2>
+            <p style="text-align: center; margin-bottom: 30px; color: #666; font-size: 1.1rem;">Select a framework to analyze this case:</p>
+            
+            <div class="compass-grid">
+                <div class="compass-quadrant" data-framework="utilitarian">
+                    <span class="compass-label">Utilitarian</span>
+                    <h4>Greatest Good</h4>
+                    <p>Focus on outcomes and consequences for the majority</p>
+                </div>
+                
+                <div class="compass-quadrant" data-framework="deontological">
+                    <span class="compass-label">Deontological</span>
+                    <h4>Duty & Rules</h4>
+                    <p>Emphasis on moral obligations and universal principles</p>
+                </div>
+                
+                <div class="compass-quadrant" data-framework="virtue">
+                    <span class="compass-label">Virtue Ethics</span>
+                    <h4>Character & Integrity</h4>
+                    <p>Evaluation based on moral character and virtues</p>
+                </div>
+                
+                <div class="compass-quadrant" data-framework="care">
+                    <span class="compass-label">Care Ethics</span>
+                    <h4>Relationships & Harm</h4>
+                    <p>Focus on care, empathy, and preventing harm</p>
+                </div>
+            </div>
+            
+            <div class="compass-analysis" data-analysis="utilitarian">
+                <h4>Utilitarian Analysis</h4>
+                <p><strong>Harm:</strong> 11 children died, dozens disabled; families traumatized; trust in Western medicine damaged in Nigeria.</p>
+                <p><strong>Benefit:</strong> Pfizer gained drug trial data (though FDA later restricted Trovan due to liver damage).</p>
+                <p><strong>Verdict:</strong> Catastrophic net negative. Children's lives sacrificed for drug that was ultimately deemed too dangerous.</p>
+            </div>
+            
+            <div class="compass-analysis" data-analysis="deontological">
+                <h4>Deontological Analysis</h4>
+                <p><strong>Laws Violated:</strong> Nigerian law, Declaration of Helsinki, UN Convention on Rights of the Child.</p>
+                <p><strong>Consent Violation:</strong> No informed consent from children or parents; falsified ethics approval.</p>
+                <p><strong>Verdict:</strong> Egregious violation of fundamental human rights and medical ethics. Children treated as mere means to corporate ends.</p>
+            </div>
+            
+            <div class="compass-analysis" data-analysis="virtue">
+                <h4>Virtue Ethics Analysis</h4>
+                <p><strong>Virtues Lacking:</strong> Respect for persons, honesty, courage to conduct ethical research.</p>
+                <p><strong>Vices Displayed:</strong> Exploitation, deception (backdated documents), cowardice (suppressing report).</p>
+                <p><strong>Verdict:</strong> Colonial-era exploitation in modern form. Pfizer treated vulnerable African children as expendable test subjects.</p>
+            </div>
+            
+            <div class="compass-analysis" data-analysis="care">
+                <h4>Care Ethics Analysis</h4>
+                <p><strong>Vulnerable Populations:</strong> Sick children, families in crisis during epidemic, poor communities.</p>
+                <p><strong>Power Imbalance:</strong> Wealthy US corporation vs. impoverished Nigerian families; information asymmetry.</p>
+                <p><strong>Verdict:</strong> Complete betrayal of care. Pfizer exploited desperation of families seeking help for dying children.</p>
+            </div>
+        </div>
+        <!-- Take the Assessment -->
+        <div class="content-section" style="margin-top: 80px; padding-top: 60px; border-top: 2px solid #000000;">
+            <h2 class="section-title">Take the Ethical Assessment</h2>
+            <div class="section-content">
+                <p style="margin-bottom: 30px;">After reading this case study, test your own ethical framework with our interactive assessment. Answer 24 questions to discover your position on the Ethics Matrix.</p>
+                
+                <a href="Ethical Compass.html" class="assessment-button" style="display: inline-block; background: #000000; color: #ffffff; padding: 18px 36px; border-radius: 25px; text-decoration: none; font-weight: 700; font-size: 1.1rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); text-transform: uppercase; letter-spacing: 1px;">
+                    Start Assessment →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ethical compass interactivity
+        document.querySelectorAll('.compass-quadrant').forEach(quadrant => {
+            quadrant.addEventListener('click', () => {
+                const framework = quadrant.getAttribute('data-framework');
+                const compass = quadrant.closest('.ethical-compass');
+                
+                // Remove selected class from all quadrants
+                compass.querySelectorAll('.compass-quadrant').forEach(q => q.classList.remove('selected'));
+                
+                // Add selected class to clicked quadrant
+                quadrant.classList.add('selected');
+                
+                // Hide all analyses
+                compass.querySelectorAll('.compass-analysis').forEach(a => a.classList.remove('visible'));
+                
+                // Show corresponding analysis
+                const analysis = compass.querySelector(`[data-analysis="${framework}"]`);
+                if (analysis) {
+                    analysis.classList.add('visible');
+                }
+            });
+        });
+
+        // Smooth scroll for back button
+        document.querySelector('.back-button').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.body.style.animation = 'fadeOut 0.4s ease';
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 400);
+        });
+    </script>
+</body>
+</html>
